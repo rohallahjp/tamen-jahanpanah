@@ -1,0 +1,5 @@
+{
+  "name": "Supply Chain Management System",
+  "description": "A comprehensive system for managing supply requests, workflows, and organizational structures within an intranet environment. It allows for dynamic workflow creation, user and role management, and detailed tracking of financial requests from submission to approval.",
+  "requestFramePermissions": []
+}
