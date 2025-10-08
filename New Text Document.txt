@@ -1,0 +1,209 @@
+--==============================================================================
+-- 1. Table Definitions
+-- This section creates all the necessary tables if they do not already exist.
+--==============================================================================
+
+CREATE TABLE IF NOT EXISTS users (
+    id BIGINT PRIMARY KEY,
+    name TEXT NOT NULL,
+    role TEXT NOT NULL,
+    username TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS counterparties (
+    id TEXT PRIMARY KEY,
+    name TEXT,
+    type TEXT,
+    national_id TEXT,
+    economic_code TEXT,
+    registration_number TEXT,
+    address TEXT,
+    phone TEXT,
+    contact_person TEXT,
+    contact_person_phone TEXT,
+    grade TEXT,
+    bank_name TEXT,
+    account_number TEXT,
+    iban TEXT
+);
+
+CREATE TABLE IF NOT EXISTS clients (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS contracts (
+    id TEXT PRIMARY KEY,
+    contract_number TEXT,
+    manual_contract_number TEXT,
+    title TEXT,
+    counterparty_id TEXT,
+    amounts JSONB,
+    start_date TEXT,
+    end_date TEXT,
+    type TEXT,
+    category TEXT,
+    status TEXT,
+    attachments JSONB,
+    approval_history JSONB,
+    guarantees JSONB,
+    amendments JSONB,
+    rejection_reason TEXT,
+    project_type TEXT,
+    related_center TEXT,
+    client_id TEXT,
+    attachment_requirements TEXT,
+    compliance_alerts JSONB,
+    payments JSONB
+);
+
+CREATE TABLE IF NOT EXISTS standalone_guarantees (
+    id TEXT PRIMARY KEY,
+    type TEXT,
+    amount REAL,
+    currency TEXT,
+    issue_date TEXT,
+    expiry_date TEXT,
+    reference_number TEXT,
+    issuer TEXT,
+    counterparty TEXT,
+    subject TEXT,
+    attachments JSONB,
+    amendments JSONB
+);
+
+CREATE TABLE IF NOT EXISTS contract_types (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE,
+    code TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS project_types (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE,
+    code TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS contract_categories (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS guarantee_types (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS payment_types (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS compliance_rules (
+    id TEXT PRIMARY KEY,
+    name TEXT,
+    description TEXT,
+    target_categories JSONB,
+    conditions JSONB,
+    error_message TEXT,
+    is_active BOOLEAN
+);
+
+
+--==============================================================================
+-- 2. Data Seeding
+-- This section inserts the initial default data into the created tables.
+--==============================================================================
+
+-- Users Data
+INSERT INTO users (id, name, role, username, password) VALUES
+(1, 'علی رضایی', 'مدیر سیستم', 'admin', 'password123'),
+(2, 'مریم احمدی', 'مسئول قراردادها', 'user', 'password123'),
+(3, 'رضا قاسمی', 'واحد حقوقی', 'legal', 'password123'),
+(4, 'سارا حسینی', 'واحد مالی', 'finance', 'password123'),
+(5, 'محمد جوادی', 'مدیرعامل', 'ceo', 'password123')
+ON CONFLICT (id) DO NOTHING;
+
+-- Counterparties Data
+INSERT INTO counterparties (id, name, type, national_id, economic_code, registration_number, address, phone, contact_person, contact_person_phone, grade, bank_name, account_number, iban) VALUES
+('co_1758180777220', 'حسین منظور', 'حقیقی', '0150387482', NULL, NULL, 'ح.آذربایجان  بین نواب ورودکی کوچه سلمان فارسی ک.منوچهرپلاک 4 واحد 3', '09359906619', 'نوری', '', '', 'پاسارگاد', '', 'IR210570026680011207799101'),
+('co_1758180226804', 'علی اصغری نزاد', 'حقیقی', '3040100602', NULL, NULL, 'رفسنجان-خ.امیر کبیر غربی ک. استقلال نبش کوچه 1', '09135869004', 'نوری', '', '', 'تجارت', '', 'IR460180000000002272148700'),
+('co_1758179091602', 'محمد قره بلاغ', 'حقیقی', '001289010103', NULL, NULL, 'تهران نبرد شمالی خیابان پاسدار گمنام ک 4شرقی \لاک 5 واحد ا', '09126351982', 'نوری', '', '', 'سپه', '', 'IR460150000003130153505974'),
+('co_1758178504154', 'مصطفی سعیدی', 'حقیقی', '0670292818', NULL, NULL, 'تهران خیابان جانبازان غربی-کوچه شهید امیری نیا \لاک 11 واحد 3', '09151871822', 'نوری', '', '', 'ملت', '', 'IR040120020000004006904321'),
+('cp_1', 'شرکت داده‌پردازان نوین', 'حقوقی', NULL, '411123456789', '12345', 'تهران، خیابان ولیعصر، برج فناوری', '021-88888888', 'خانم مهندس شریفی', '09121112233', 'گرید ۱', 'پاسارگاد', '123-456-789', 'IR123456789012345678901234'),
+('cp_2', 'فروشگاه رایان سیستم', 'حقوقی', NULL, '411987654321', '54321', 'تهران، خیابان جمهوری، پاساژ علاالدین', '021-66666666', 'آقای محمودی', '09124445566', 'گرید ۳', NULL, NULL, NULL),
+('cp_3', 'شرکت پاکیزه‌سازان', 'حقوقی', NULL, '411555666777', '67890', NULL, '021-44444444', 'آقای کریمی', NULL, 'گرید ۲', NULL, NULL, NULL),
+('cp_4', 'آقای محمدی', 'حقیقی', '0071234567', NULL, NULL, NULL, '09127778899', NULL, NULL, NULL, NULL, NULL, NULL),
+('cp_5', 'شرکت مشاوران برتر', 'حقوقی', NULL, '411111222333', '11223', NULL, '021-22222222', 'دکتر زمانی', NULL, 'گرید ۱', NULL, NULL, NULL)
+ON CONFLICT (id) DO NOTHING;
+
+-- Clients Data
+INSERT INTO clients (id, name) VALUES
+('cl_1', 'معاونت فناوری'),
+('cl_2', 'واحد اداری و پشتیبانی'),
+('cl_3', 'مدیریت ساختمان'),
+('cl_4', 'واحد لجستیک'),
+('cl_5', 'معاونت بازاریابی')
+ON CONFLICT (id) DO NOTHING;
+
+-- Contract Types Data
+INSERT INTO contract_types (id, name, code) VALUES
+('t1', 'خرید', 'KHR'),
+('t2', 'فروش', 'FRH'),
+('t3', 'خدمات', 'KHD'),
+('t4', 'اجاره', 'EJR')
+ON CONFLICT (id) DO NOTHING;
+
+-- Project Types Data
+INSERT INTO project_types (id, name, code) VALUES
+('pt1', 'پروژه‌ای', 'PRJ'),
+('pt2', 'تحقیقاتی', 'RSR'),
+('pt3', 'تولیدی', 'PRO')
+ON CONFLICT (id) DO NOTHING;
+
+-- Contract Categories Data
+INSERT INTO contract_categories (id, name) VALUES
+('c1', 'IT'),
+('c2', 'تدارکات'),
+('c3', 'منابع انسانی'),
+('c4', 'پشتیبانی'),
+('c5', 'عمرانی')
+ON CONFLICT (id) DO NOTHING;
+
+-- Guarantee Types Data
+INSERT INTO guarantee_types (id, name) VALUES
+('gt1', 'پیش پرداخت'),
+('gt2', 'حسن انجام کار'),
+('gt3', 'تعهد پرداخت')
+ON CONFLICT (id) DO NOTHING;
+
+-- Payment Types Data
+INSERT INTO payment_types (id, name) VALUES
+('pt1', 'پیش پرداخت'),
+('pt2', 'نقدی'),
+('pt3', 'چک'),
+('pt4', 'حواله'),
+('pt5', 'اقساط')
+ON CONFLICT (id) DO NOTHING;
+
+-- Compliance Rules Data
+INSERT INTO compliance_rules (id, name, description, target_categories, conditions, error_message, is_active) VALUES
+('rule_1', 'سقف پیش‌پرداخت قراردادهای عمرانی', 'مطابق آیین‌نامه، پیش‌پرداخت در قراردادهای عمرانی نباید از 25 درصد مبلغ کل قرارداد (ریالی) بیشتر باشد.', '["عمرانی"]', '{"maxAdvancePaymentPercentage": 25}', 'مبلغ پیش‌پرداخت از سقف مجاز 25 درصد بیشتر است.', TRUE),
+('rule_2', 'سقف مبلغ قرارداد بر اساس گرید پیمانکار', 'مبلغ قرارداد (ریالی) نباید از سقف مجاز تعریف شده برای گرید پیمانکار بیشتر باشد.', '[]', '{"maxAmountByGrade": {"گرید ۱": 50000000000, "گرید ۲": 25000000000, "گرید ۳": 10000000000}}', 'مبلغ قرارداد از سقف مجاز برای گرید پیمانکار بیشتر است.', TRUE),
+('rule_3', 'ضمانت نامه', 'بررسی حداقل ۱۰ درصد مبلغ قرارداد برای ضمانت‌نامه حسن انجام کار.', '[]', '{"minGuarantee": {"type": "حسن انجام کار", "minPercentage": 10}}', 'ضمانت‌نامه حسن انجام کار باید حداقل ۱۰ درصد مبلغ قرارداد باشد.', TRUE)
+ON CONFLICT (id) DO NOTHING;
+
+-- Contracts Data
+INSERT INTO contracts (id, contract_number, manual_contract_number, title, counterparty_id, amounts, start_date, end_date, type, category, status, attachments, payments, approval_history, guarantees, amendments, rejection_reason, project_type, related_center, client_id, attachment_requirements, compliance_alerts) VALUES
+('1758180949902', '1403-04-0001', '', 'دستگاه فیلامنت کامپوزیتی', 'co_1758180777220', '{"rial": 1100000000}', '2024-07-08', '2026-01-08', 'خدمات', 'پشتیبانی', 'در انتظار تأیید حقوقی', '[]', '[]', '[]', '[]', '[]', NULL, 'تحقیقاتی', 'نوآوری', 'cl_1', 'بدون قالب', '[{"ruleName": "ضمانت نامه", "message": "ضمانت‌نامه الزامی از نوع \"حسن انجام کار\" ثبت نشده است."}]'),
+('1758180399603', '1403-09-0001', '', 'هیدروفن کوانتمی', 'co_1758180226804', '{"rial": 900000000}', '2024-12-01', '2025-07-02', 'خدمات', 'پشتیبانی', 'در انتظار تأیید حقوقی', '[]', '[]', '[]', '[]', '[]', NULL, 'تحقیقاتی', 'نوآوری', 'cl_1', 'بدون قالب', '[{"ruleName": "ضمانت نامه", "message": "ضمانت‌نامه الزامی از نوع \"حسن انجام کار\" ثبت نشده است."}]'),
+('1758179311405', '1404-02-0001', '', 'شبیه ساز پهباد عمود پرواز', 'co_1758179091602', '{"rial": 900000000}', '2025-05-11', '2025-10-13', 'خدمات', 'پشتیبانی', 'در انتظار تأیید حقوقی', '[]', '[]', '[]', '[]', '[]', NULL, 'تحقیقاتی', 'نوآوری', 'cl_1', 'بدون قالب', '[{"ruleName": "ضمانت نامه", "message": "ضمانت‌نامه الزامی از نوع \"حسن انجام کار\" ثبت نشده است."}]'),
+('1758178747437', '1404-06-0001', '403-11-2', 'شبیه ساز واکنش شیمیایی مخزن', 'co_1758178504154', '{"rial": 800000000}', '2025-09-18', '2025-09-18', 'خدمات', 'پشتیبانی', 'در انتظار تأیید حقوقی', '[]', '[]', '[]', '[]', '[]', NULL, 'تحقیقاتی', 'نوآوری', 'cl_2', 'بدون قالب', '[{"ruleName": "ضمانت نامه", "message": "ضمانت‌نامه الزامی از نوع \"حسن انجام کار\" ثبت نشده است."}]')
+ON CONFLICT (id) DO NOTHING;
+
+-- Standalone Guarantees Data
+INSERT INTO standalone_guarantees (id, type, amount, currency, issue_date, expiry_date, reference_number, issuer, counterparty, subject, attachments, amendments) VALUES
+('sg-1', 'حسن انجام کار', 50000000, 'ریال', '2024-02-10', '2025-02-10', 'SG-10293', 'بانک پاسارگاد', 'پیمانکار الف', 'تضمین اجرای پروژه ساختمانی', '[{"name": "ضمانتنامه_بانکی_الف.pdf", "size": "800KB", "type": "PDF"}]', '[]'),
+('sg-2', 'پیش پرداخت', 20000, 'دلار', '2024-06-01', '2024-07-26', 'SG-A4588', NULL, 'تامین‌کننده خارجی تجهیزات', 'پیش‌پرداخت خرید سرورهای HP', '[]', '[]')
+ON CONFLICT (id) DO NOTHING;

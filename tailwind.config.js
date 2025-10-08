@@ -1,6 +1,7 @@
 
+
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -8,7 +9,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Vazirmatn', 'sans-serif'],
+        // Replaced 'Vazirmatn' with a system-safe font 'Tahoma' for better offline/intranet compatibility.
+        sans: ['Tahoma', 'sans-serif'],
       },
       transitionProperty: {
         'margin': 'margin',
